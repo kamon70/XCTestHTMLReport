@@ -85,8 +85,12 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-r TestResultsA -r TestResultsB -v"
+            argument = "-r /Users/kamon/Downloads/TestResults/device0 -r /Users/kamon/Downloads/TestResults/device1 -r /Users/kamon/Downloads/TestResults/device2 -r /Users/kamon/Downloads/TestResults/device3 -v"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-r /Users/kamon/Downloads/TestResults/device0 -v"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
