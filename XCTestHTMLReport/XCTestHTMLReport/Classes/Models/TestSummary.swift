@@ -14,37 +14,23 @@ struct TestSummary: HTML
     var testName: String
     var tests: [Test]
     var status: Status {
-        let currentTests = tests
-        var status: Status = .unknown
-
-        var currentSubtests: [Test] = []
-        for test in currentTests {
-            currentSubtests += test.allTestSummaries()
-        }
-        
-        if currentTests.count == 0 {
+        if tests.isEmpty {
             return .success
         }
-
-        status = currentSubtests.reduce(.unknown, { (accumulator: Status, test: Test) -> Status in
-            if accumulator == .unknown {
-                return test.status
-            }
-
-            if test.status == .failure {
+        
+        let computedStatus = tests.reduce(.unknown) { (accumulator, test) -> Status in
+            if accumulator == .failure {
                 return .failure
             }
-
-            if test.status == .success {
-                return accumulator == .failure ? .failure : .success
+            let testStatus = test.status
+            if accumulator == .success {
+                return testStatus == .failure ? .failure : .success
             }
-
-            return .unknown
-        })
-
-        return status
+            return testStatus
+        }
+        return computedStatus
     }
-
+    
     init(screenshotsPath: String, dict: [String : Any])
     {
         Logger.substep("Parsing TestSummary")
@@ -54,11 +40,11 @@ struct TestSummary: HTML
         let rawTests = dict["Tests"] as! [[String: Any]]
         tests = rawTests.map { Test(screenshotsPath: screenshotsPath, dict: $0) }
     }
-
+    
     // PRAGMA MARK: - HTML
-
+    
     var htmlTemplate = HTMLTemplates.testSummary
-
+    
     var htmlPlaceholderValues: [String: String] {
         return [
             "UUID": uuid,
@@ -66,22 +52,5 @@ struct TestSummary: HTML
                 return accumulator + test.html
             })
         ]
-    }
-}
-
-extension Test {
-    func allTestSummaries() -> [Test] {
-        print("CALL allTestSummaries")
-        if self.objectClass == .testSummary {
-            return [self]
-        }
-        guard let subTests = self.subTests, subTests.isEmpty == false else {
-            return []
-        }
-        var testsToReturn: [Test] = []
-        for test in subTests {
-            testsToReturn += test.allTestSummaries()
-        }
-        return testsToReturn
     }
 }
